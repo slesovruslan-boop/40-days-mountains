@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>40 дней в горы</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-main: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --bg-dark: #151515;
+            --accent: #E8C547;
+            --success: #4CAF50;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0 20px;
+            position: relative;
+        }
+        
+        .header h1 {
+            color: var(--accent);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Экран оплаты */
+        .payment-gate {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .payment-gate h2 {
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        
+        .payment-gate p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .price {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 24px 0;
+        }
+        
+        .price span {
+            font-size: 24px;
+        }
+        
+        .features {
+            text-align: left;
+            margin: 24px 0;
+        }
+        
+        .feature {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg-dark);
+        }
+        
+        .feature:before {
+            content: "✓ ";
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        /* Кнопки */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:active {
+            opacity: 0.8;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid #333;
+        }
+        
+        /* Поле ввода */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        input[type="text"]::placeholder, textarea::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .promo-input {
+            margin: 20px 0;
+        }
+        
+        /* Меню */
+        .tab-menu {
+            position: sticky;
+            top: 0;
+            background: var(--bg-main);
+            z-index: 100;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--bg-dark);
+            margin-bottom: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: 12px 20px;
+            background: var(--bg-dark);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .tab-button.active {
+            background: var(--accent);
+            color: #000;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Карточки дней */
+        .day-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        
+        .day-card h2 {
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        
+        .day-card h3 {
+            margin: 16px 0 8px;
+        }
+        
+        .day-card p {
+            margin: 8px 0;
+            color: var(--text-secondary);
+        }
+        
+        .completed {
+            opacity: 0.6;
+        }
+        
+        .locked {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        /* Прогресс */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+        
+        /* Календарь */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        /* Админская точка */
+        .admin-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .admin-dot:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Экран оплаты -->
+        <div id="paymentGate" class="payment-gate">
+            <div class="header">
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M32 8L48 32L56 28L32 4L8 28L16 32L32 8Z" fill="url(#gradient1)"/>
+                        <path d="M16 32L32 8L48 32L56 40L32 16L8 40L16 32Z" fill="url(#gradient2)" opacity="0.8"/>
+                        <path d="M8 40L32 16L56 40L60 48H4L8 40Z" fill="url(#gradient3)" opacity="0.6"/>
+                        <rect y="48" width="64" height="16" fill="url(#gradient4)"/>
+                        <circle cx="48" cy="20" r="3" fill="#FFF" opacity="0.9"/>
+                        <defs>
+                            <linearGradient id="gradient1" x1="32" y1="4" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#E8C547"/>
+                                <stop offset="1" stop-color="#C7A842"/>
+                            </linearGradient>
+                            <linearGradient id="gradient2" x1="32" y1="8" x2="32" y2="40" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#C7A842"/>
+                                <stop offset="1" stop-color="#A08935"/>
+                            </linearGradient>
+                            <linearGradient id="gradient3" x1="32" y1="16" x2="32" y2="48" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#8B7830"/>
+                                <stop offset="1" stop-color="#6B5D25"/>
+                            </linearGradient>
+                            <linearGradient id="gradient4" x1="32" y1="48" x2="32" y2="64" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#4A4A4A"/>
+                                <stop offset="1" stop-color="#2A2A2A"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1>40 ДНЕЙ В ГОРЫ</h1>
+                <p>Путь через дисциплину, тишину и тело</p>
+                <!-- Скрытая точка для админа -->
+                <div class="admin-dot" onclick="adminLogin()"></div>
+            </div>
+            
+            <h2>Начни путь</h2>
+            <p>Сорок дней без обещаний и без уловок. Это про то, как ты держишь слово самому себе.</p>
+            
+            <div class="price">1000 <span>₽</span></div>
+            
+            <div class="features">
+                <div class="feature">40 дней структурированного пути</div>
+                <div class="feature">Система прогресса и достижений</div>
+                <div class="feature">Личный дневник размышлений</div>
+                <div class="feature">Доступ к оффлайн встрече после прохождения</div>
+                <div class="feature">Персональный отчёт и рекомендации</div>
+            </div>
+
+            <input type="text" id="promoInput" class="promo-input" placeholder="Промокод (если есть)">
+            
+            <button class="btn btn-primary" onclick="processPayment()">Оплатить 1000₽</button>
+            
+            <p style="color: var(--text-secondary); font-size: 14px; margin: 16px 0;">или</p>
+            
+            <button class="btn btn-secondary" onclick="activatePromo()" style="background: var(--bg-dark);">Активировать промокод</button>
+            
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 16px;">
+                Нет промокода? Напишите @neuroexchanger
+            </p>
+            
+            <button class="btn btn-secondary" onclick="restorePurchase()">Восстановить покупку</button>
+        </div>
+
+        <!-- Главное приложение -->
+        <div id="mainApp" class="hidden">
+            <div class="header">
+                <h1>40 ДНЕЙ В ГОРЫ</h1>
+                <p>День <span id="currentDayNum">0</span> из 40</p>
+            </div>
+            
+            <!-- Меню -->
+            <div class="tab-menu">
+                <div class="tab-buttons">
+                    <button onclick="showTab('home')" id="tabHome" class="tab-button active">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;">
+                            <path d="M8 2L12 6L14 5L8 1L2 5L4 6L8 2Z"/>
+                            <path d="M2 6L8 2L14 6L15 8H1L2 6Z" opacity="0.7"/>
+                        </svg>
+                        Главная
+                    </button>
+                    <button onclick="showTab('achievements')" id="tabAchievements" class="tab-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;">
+                            <path d="M8 1L10 6H15L11 9L12.5 14L8 11L3.5 14L5 9L1 6H6L8 1Z"/>
+                        </svg>
+                        Достижения
+                    </button>
+                    <button onclick="showTab('results')" id="tabResults" class="tab-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;">
+                            <rect x="2" y="10" width="3" height="5"/>
+                            <rect x="6.5" y="7" width="3" height="8"/>
+                            <rect x="11" y="3" width="3" height="12"/>
+                        </svg>
+                        Результаты
+                    </button>
+                    <button onclick="showTab('support')" id="tabSupport" class="tab-button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: -2px; margin-right: 6px;">
+                            <path d="M8 1C4.5 1 2 3.5 2 7c0 2.5 1.5 4.5 3.5 5.5v2.5l2.5-2h0c.5.1 1 .1 1.5 0h0l2.5 2v-2.5c2-1 3.5-3 3.5-5.5 0-3.5-2.5-6-6-6z"/>
+                        </svg>
+                        Поддержка
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Вкладка: Главная -->
+            <div id="tabContentHome" class="tab-content active">
+                <div id="dayContent"></div>
+            </div>
+            
+            <!-- Вкладка: Достижения -->
+            <div id="tabContentAchievements" class="tab-content">
+                <h2>Достижения</h2>
+                <div id="achievementsList"></div>
+            </div>
+            
+            <!-- Вкладка: Результаты -->
+            <div id="tabContentResults" class="tab-content">
+                <h2>Результаты</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 20px 0;">
+                    <div class="day-card" style="text-align: center;">
+                        <div style="font-size: 32px; color: var(--accent);" id="resultsCompleted">0</div>
+                        <div style="color: var(--text-secondary);">Завершено дней</div>
+                    </div>
+                    <div class="day-card" style="text-align: center;">
+                        <div style="font-size: 32px; color: var(--accent);" id="resultsStreak">0</div>
+                        <div style="color: var(--text-secondary);">Streak</div>
+                    </div>
+                </div>
+                <div class="calendar" id="resultsCalendar"></div>
+            </div>
+            
+            <!-- Вкладка: Поддержка -->
+            <div id="tabContentSupport" class="tab-content">
+                <h2>Поддержка</h2>
+                <div class="day-card">
+                    <p>По всем вопросам пишите:</p>
+                    <button class="btn btn-primary" onclick="openSupport()">@neuroexchanger</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+    
+    <script src="content.js"></script>
+    <script>
+        // Telegram WebApp
+        const tg = window.Telegram?.WebApp || {
+            initDataUnsafe: { user: { id: 999999, first_name: 'Test' } }
+        };
+        if (tg.expand) tg.expand();
+        if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
+        
+        // Константы
+        const ADMIN_PASSWORD = 'rttd67hyo1';
+        const PROMO_CODE = 'rttd67hyo1!';
+        const SUPPORT_USERNAME = 'neuroexchanger';
+        const APP_VERSION = '1.0';
+        
+        // Данные пользователя
+        let userData = {
+            userId: null,
+            paid: false,
+            promoCode: null,
+            currentDay: 0,
+            completedDays: [],
+            startDate: null,
+            lastCompletedDate: null,
+            streak: 0,
+            journal: {},
+            achievements: [],
+            eventRegistered: false
+        };
+        
+        // Загрузка данных
+        function loadUserData() {
+            const userId = tg.initDataUnsafe?.user?.id;
+            if (!userId) return false;
+            
+            userData.userId = userId;
+            const saved = localStorage.getItem(`40days_${userId}`);
+            if (saved) {
+                userData = { ...userData, ...JSON.parse(saved) };
+                return true;
+            }
+            return false;
+        }
+        
+        // Сохранение данных
+        function saveUserData() {
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                userData.username = user.username || null;
+                userData.firstName = user.first_name || null;
+                userData.lastName = user.last_name || null;
+            }
+            localStorage.setItem(`40days_${userData.userId}`, JSON.stringify(userData));
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+        
+        // Админ
+        function adminLogin() {
+            const password = prompt('Пароль администратора:');
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminAuthenticated', 'true');
+                showToast('Добро пожаловать, администратор');
+                location.reload();
+            } else if (password) {
+                showToast('Неверный пароль');
+            }
+        }
+        
+        function isAdmin() {
+            return sessionStorage.getItem('adminAuthenticated') === 'true';
+        }
+        
+        // Активация промокода
+        function activatePromo() {
+            const promoInput = document.getElementById('promoInput');
+            const promoCode = promoInput ? promoInput.value.trim() : '';
+            
+            if (promoCode === PROMO_CODE) {
+                userData.paid = true;
+                userData.promoCode = promoCode;
+                userData.activatedAt = new Date().toISOString();
+                saveUserData();
+                
+                document.getElementById('paymentGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                startJourney();
+                showToast('Промокод активирован!');
+                return;
+            }
+            
+            if (promoCode) {
+                showToast('Неверный промокод');
+            } else {
+                showToast('Введите промокод');
+            }
+        }
+        
+        // Оплата (пока заглушка)
+        async function processPayment() {
+            showToast('Оплата временно недоступна. Используйте промокод.');
+        }
+        
+        // Восстановление покупки
+        function restorePurchase() {
+            if (loadUserData() && userData.paid) {
+                document.getElementById('paymentGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                startJourney();
+                showToast('Покупка восстановлена!');
+            } else {
+                showToast('Покупка не найдена');
+            }
+        }
+        
+        // Начало путешествия
+        function startJourney() {
+            if (!userData.startDate) {
+                userData.startDate = new Date().toISOString();
+                userData.currentDay = 1;
+                saveUserData();
+            }
+            updateUI();
+        }
+        
+        // Переключение вкладок
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+            document.getElementById('tabContent' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+            
+            if (tabName === 'results') updateResultsTab();
+            if (tabName === 'achievements') updateAchievementsTab();
+        }
+        
+        // Обновление UI
+        function updateUI() {
+            document.getElementById('currentDayNum').textContent = userData.currentDay;
+            updateDayContent();
+            updateResultsTab();
+            checkDayUnlock();
+        }
+        
+        // Проверка разблокировки дня
+        function checkDayUnlock() {
+            if (isAdmin()) return;
+            
+            if (userData.completedDays.length === 0) return;
+            
+            const lastCompleted = new Date(userData.lastCompletedDate);
+            const now = new Date();
+            const hoursSince = (now - lastCompleted) / (1000 * 60 * 60);
+            
+            if (hoursSince >= 24 && userData.currentDay < 40) {
+                userData.currentDay++;
+                saveUserData();
+                updateUI();
+                showToast('Новый день открыт!');
+            }
+        }
+        
+        // Отображение контента дня
+        function updateDayContent() {
+            const allDays = typeof getAllDays === 'function' ? getAllDays() : [];
+            const dayData = allDays.find(d => d.day === userData.currentDay);
+            
+            if (!dayData) {
+                document.getElementById('dayContent').innerHTML = '<div class="day-card"><h2>День не найден</h2></div>';
+                return;
+            }
+            
+            const isCompleted = userData.completedDays.includes(userData.currentDay);
+            const journalText = userData.journal[userData.currentDay] || '';
+            
+            document.getElementById('dayContent').innerHTML = `
+                <div class="day-card ${isCompleted ? 'completed' : ''}">
+                    <h2>День ${dayData.day}: ${dayData.title}</h2>
+                    <h3>Задача</h3>
+                    <p>${dayData.task}</p>
+                    <h3>Наблюдение</h3>
+                    <p>${dayData.observation}</p>
+                    <h3>Вопрос</h3>
+                    <p>${dayData.question}</p>
+                    <h3>Твои заметки</h3>
+                    <textarea id="journalInput" rows="4" placeholder="Запиши свои мысли...">${journalText}</textarea>
+                    ${isCompleted ? 
+                        '<button class="btn btn-secondary" disabled>День завершён</button>' :
+                        '<button class="btn btn-primary" onclick="completeDay()">Завершить день</button>'
+                    }
+                </div>
+            `;
+        }
+        
+        // Завершение дня
+        function completeDay() {
+            const journalInput = document.getElementById('journalInput');
+            if (journalInput) {
+                userData.journal[userData.currentDay] = journalInput.value;
+            }
+            
+            if (!userData.completedDays.includes(userData.currentDay)) {
+                userData.completedDays.push(userData.currentDay);
+                userData.lastCompletedDate = new Date().toISOString();
+                
+                if (userData.completedDays.length === 1 || 
+                    userData.completedDays.includes(userData.currentDay - 1)) {
+                    userData.streak++;
+                } else {
+                    userData.streak = 1;
+                }
+                
+                saveUserData();
+                
+                if (userData.currentDay < 40) {
+                    showToast('День завершён! Следующий день откроется завтра');
+                    updateUI();
+                } else {
+                    showToast('Поздравляю! Ты прошёл весь путь!');
+                    updateUI();
+                }
+            } else {
+                showToast('Этот день уже завершён');
+            }
+        }
+        
+        // Обновление результатов
+        function updateResultsTab() {
+            document.getElementById('resultsCompleted').textContent = userData.completedDays.length;
+            document.getElementById('resultsStreak').textContent = userData.streak;
+            
+            const calendar = document.getElementById('resultsCalendar');
+            calendar.innerHTML = '';
+            
+            for (let i = 1; i <= 40; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+                
+                if (userData.completedDays.includes(i)) {
+                    day.style.background = 'var(--success)';
+                    day.style.color = '#000';
+                } else if (i === userData.currentDay) {
+                    day.style.background = 'var(--accent)';
+                    day.style.color = '#000';
+                } else {
+                    day.style.background = 'var(--bg-dark)';
+                    day.style.color = 'var(--text-secondary)';
+                    if (i > userData.currentDay) day.style.opacity = '0.3';
+                }
+                
+                calendar.appendChild(day);
+            }
+        }
+        
+        // Обновление достижений
+        function updateAchievementsTab() {
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '<div class="day-card"><p>Достижения появятся по мере прогресса</p></div>';
+        }
+        
+        // Поддержка
+        function openSupport() {
+            window.open(`https://t.me/${SUPPORT_USERNAME}`, '_blank');
+        }
+        
+        // Загрузка при старте
+        window.onload = function() {
+            if (loadUserData() && userData.paid) {
+                document.getElementById('paymentGate').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                startJourney();
+            }
+        };
+    </script>
+</body>
+</html>
