@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ДЕНЬ X</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --gray: #e0e0e0;
+  --gray-dark: #808080;
+  --accent: #ff4747;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* ═══ AUTH ═══ */
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--black) 0%, #1a1a1a 100%);
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-logo {
+  font-size: 80px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: -2px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 20px;
+  font-size: 18px;
+  border: 3px solid var(--white);
+  background: transparent;
+  color: var(--white);
+  outline: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.auth-input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.auth-btn-primary {
+  background: var(--white);
+  color: var(--black);
+  margin-bottom: 12px;
+}
+
+.auth-btn-primary:active {
+  transform: scale(0.98);
+}
+
+.auth-btn-secondary {
+  background: transparent;
+  color: var(--white);
+  border: 3px solid var(--white);
+}
+
+.auth-error {
+  color: var(--accent);
+  text-align: center;
+  margin-top: 16px;
+  display: none;
+  font-weight: 600;
+}
+
+.auth-link {
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  margin-top: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+/* ═══ PAYMENT ═══ */
+.payment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--black);
+}
+
+.pay-box {
+  width: 100%;
+  max-width: 480px;
+  background: var(--white);
+  padding: 48px 32px;
+}
+
+.pay-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  letter-spacing: -1px;
+}
+
+.pay-price {
+  font-size: 72px;
+  font-weight: 700;
+  margin: 32px 0;
+  letter-spacing: -2px;
+}
+
+.pay-list {
+  list-style: none;
+  margin: 32px 0;
+}
+
+.pay-list li {
+  padding: 16px 0;
+  border-bottom: 2px solid var(--gray);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.pay-list li:last-child {
+  border: none;
+}
+
+.pay-btn {
+  width: 100%;
+  padding: 24px;
+  background: var(--black);
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.pay-back {
+  text-align: center;
+  margin-top: 20px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ═══ HEADER ═══ */
+.header {
+  background: var(--black);
+  color: var(--white);
+  padding: 24px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header-logo {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.header-exit {
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.header-day {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ═══ CONTAINER ═══ */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px 100px;
+}
+
+/* ═══ TASK CARD ═══ */
+.task-main {
+  background: var(--black);
+  color: var(--white);
+  padding: 48px 32px;
+  margin: -40px 20px 40px;
+  position: relative;
+}
+
+.task-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: var(--accent);
+}
+
+.task-label {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  opacity: 0.5;
+  margin-bottom: 20px;
+}
+
+.task-title {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+
+.task-desc {
+  font-size: 20px;
+  line-height: 1.6;
+  opacity: 0.8;
+  margin-bottom: 32px;
+}
+
+.task-time {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+}
+
+.task-btn {
+  width: 100%;
+  padding: 24px;
+  background: var(--white);
+  color: var(--black);
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.task-btn:active {
+  transform: scale(0.98);
+}
+
+.task-btn.done {
+  background: var(--accent);
+  color: var(--white);
+  pointer-events: none;
+}
+
+/* ═══ PROGRESS ═══ */
+.progress-section {
+  margin-bottom: 40px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.progress-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.progress-pct {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.progress-bar {
+  height: 12px;
+  background: var(--gray);
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--black);
+  transition: width 1s ease;
+}
+
+.progress-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 8px;
+}
+
+.day-dot {
+  aspect-ratio: 1;
+  background: var(--gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.day-dot.done {
+  background: var(--black);
+  color: var(--white);
+}
+
+.day-dot.current {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.day-dot.locked {
+  opacity: 0.3;
+}
+
+/* ═══ STATS ═══ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  border: 3px solid var(--black);
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -2px;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.5;
+}
+
+/* ═══ TASKS LIST ═══ */
+.task-row {
+  display: flex;
+  gap: 20px;
+  padding: 24px 20px;
+  border-bottom: 2px solid var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-row:hover {
+  background: var(--gray);
+}
+
+.task-row.locked {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.task-row.locked:hover {
+  background: transparent;
+}
+
+.task-num {
+  font-size: 32px;
+  font-weight: 700;
+  min-width: 60px;
+  text-align: right;
+}
+
+.task-num.done {
+  color: var(--accent);
+}
+
+.task-num.current {
+  color: var(--accent);
+}
+
+.task-body {
+  flex: 1;
+}
+
+.task-name {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.task-row.done-task .task-name {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.task-cat {
+  font-size: 14px;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.task-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+/* ═══ ADMIN ═══ */
+.admin-tabs {
+  display: flex;
+  border-bottom: 3px solid var(--black);
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 20px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+}
+
+.admin-tab.active {
+  border-bottom-color: var(--accent);
+}
+
+.admin-content {
+  padding: 40px 20px;
+}
+
+.user-card {
+  border: 3px solid var(--black);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.user-code {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.user-info {
+  font-size: 16px;
+  opacity: 0.6;
+  line-height: 1.6;
+}
+
+/* ═══ NAV ═══ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--black);
+  display: flex;
+  z-index: 100;
+}
+
+.nav-btn {
+  flex: 1;
+  padding: 20px;
+  color: rgba(255,255,255,0.5);
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.nav-btn.active {
+  color: var(--white);
+  background: var(--accent);
+}
+
+/* ═══ MODAL ═══ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--white);
+  padding: 48px 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.modal-text {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  opacity: 0.8;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 20px;
+  background: var(--black);
+  color: var(--white);
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth" class="screen active">
+  <div class="auth">
+    <div class="auth-box">
+      <div class="auth-logo">ДЕНЬ X</div>
+      <input type="text" id="promoInput" class="auth-input" placeholder="ПРОМОКОД">
+      <button class="auth-btn auth-btn-primary" onclick="checkPromo()">ВОЙТИ</button>
+      <button class="auth-btn auth-btn-secondary" onclick="showPayment()">КУПИТЬ — 1000₽</button>
+      <div class="auth-error" id="authError">Неверный промокод</div>
+      <div class="auth-link" onclick="showAdminAuth()">Админ-панель</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="payment" class="screen">
+  <div class="payment">
+    <div class="pay-box">
+      <div class="pay-title">40 ДНЕЙ К НОВОЙ ЖИЗНИ</div>
+      <div class="pay-price">1000₽</div>
+      <ul class="pay-list">
+        <li>40 заданий для трансформации</li>
+        <li>Трекинг прогресса</li>
+        <li>Пожизненный доступ</li>
+        <li>Бесплатные обновления</li>
+      </ul>
+      <a href="https://t.me/neuroexchanger" class="pay-btn">ПЕРЕЙТИ К ОПЛАТЕ</a>
+      <div class="pay-back" onclick="backToAuth()">← Назад</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN AUTH -->
+<div id="adminAuth" class="screen">
+  <div class="auth">
+    <div class="auth-box">
+      <div class="auth-logo">ADMIN</div>
+      <input type="password" id="adminPass" class="auth-input" placeholder="ПАРОЛЬ">
+      <button class="auth-btn auth-btn-primary" onclick="checkAdmin()">ВОЙТИ</button>
+      <div class="auth-error" id="adminError">Неверный пароль</div>
+      <div class="auth-link" onclick="backToAuth()">← Назад</div>
+    </div>
+  </div>
+</div>
+
+<!-- TODAY -->
+<div id="today" class="screen">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">ДЕНЬ X</div>
+      <div class="header-exit" onclick="logout()">ВЫХОД</div>
+    </div>
+    <div class="header-day" id="headerDay">ДЕНЬ 1 / 40</div>
+  </div>
+  
+  <div class="task-main">
+    <div class="task-label" id="taskLabel">ДЕНЬ 1</div>
+    <div class="task-title" id="taskTitle">Загрузка...</div>
+    <div class="task-desc" id="taskDesc">—</div>
+    <div class="task-time" id="taskTime">—</div>
+    <button class="task-btn" id="taskBtn" onclick="completeTask()">ВЫПОЛНИТЬ</button>
+  </div>
+  
+  <div class="container">
+    <div class="progress-section">
+      <div class="progress-header">
+        <div class="progress-title">ПРОГРЕСС</div>
+        <div class="progress-pct" id="progressPct">0%</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-grid" id="progressGrid"></div>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-label">ВЫПОЛНЕНО</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statStreak">0</div>
+        <div class="stat-label">СЕРИЯ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TASKS -->
+<div id="tasks" class="screen">
+  <div class="header">
+    <div class="header-logo">ВСЕ ЗАДАНИЯ</div>
+  </div>
+  <div id="tasksList"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">ADMIN</div>
+      <div class="header-exit" onclick="logout()">ВЫХОД</div>
+    </div>
+  </div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchAdminTab('users',this)">ПОЛЬЗОВАТЕЛИ</button>
+    <button class="admin-tab" onclick="switchAdminTab('stats',this)">СТАТИСТИКА</button>
+  </div>
+  <div class="admin-content" id="adminContent"></div>
+</div>
+
+<!-- NAV -->
+<nav class="bottom-nav" id="nav">
+  <button class="nav-btn active" onclick="switchTab('today',this)">СЕГОДНЯ</button>
+  <button class="nav-btn" onclick="switchTab('tasks',this)">ЗАДАНИЯ</button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">ГОТОВО!</div>
+    <div class="modal-text" id="modalText">День выполнен</div>
+    <button class="modal-btn" onclick="closeModal()">ПРОДОЛЖИТЬ</button>
+  </div>
+</div>
+
+<script>
+// ═══ TELEGRAM WEB APP ═══
+let tg = window.Telegram?.WebApp;
+let isTelegram = !!tg;
+if (tg) { tg.ready(); tg.expand(); }
+
+const TASKS = [
+  {day:1,  title:'30 приседаний', desc:'Медленно, правильно. Почувствуй каждое движение.', time:'2 МИН'},
+  {day:2,  title:'Удали 3 приложения', desc:'Которыми не пользуешься месяц. Без сожалений.', time:'5 МИН'},
+  {day:3,  title:'5 страниц вслух', desc:'Любая книга. Читай медленно, осознанно.', time:'10 МИН'},
+  {day:4,  title:'Голосовое другу', desc:'Старому знакомому. Просто "привет, как дела".', time:'3 МИН'},
+  {day:5,  title:'2 литра воды', desc:'Только вода. Отследи каждый стакан.', time:'ВЕСЬ ДЕНЬ'},
+  {day:6,  title:'Идея заработка', desc:'Запиши одну идею на 10 000₽ в месяц.', time:'10 МИН'},
+  {day:7,  title:'Максимум отжиманий', desc:'Сколько сможешь. Запиши рекорд.', time:'3 МИН'},
+  {day:8,  title:'Почисти email', desc:'Отпишись от всех мёртвых рассылок.', time:'15 МИН'},
+  {day:9,  title:'Медитация 5 минут', desc:'Сядь, закрой глаза, дыши. Таймер.', time:'5 МИН'},
+  {day:10, title:'Завтрак сам', desc:'Приготовь. Не доставка. Съешь осознанно.', time:'20 МИН'},
+  {day:11, title:'3 благодарности', desc:'Запиши три вещи за которые благодарен.', time:'5 МИН'},
+  {day:12, title:'Холодный душ', desc:'30 секунд после обычного. Дыши.', time:'30 СЕК'},
+  {day:13, title:'Обнови фото', desc:'Новый аватар везде. Свежий образ.', time:'15 МИН'},
+  {day:14, title:'5000 шагов', desc:'Гуляй, думай, слушай музыку.', time:'40 МИН'},
+  {day:15, title:'Убери стол', desc:'Разбери всё. Протри. Порядок.', time:'15 МИН'},
+  {day:16, title:'TED на английском', desc:'Без субтитров если можешь.', time:'18 МИН'},
+  {day:17, title:'Аудио в будущее', desc:'Расскажи себе каким будешь через год.', time:'5 МИН'},
+  {day:18, title:'Планка минута', desc:'Правильная техника. Всё тело напряжено.', time:'1 МИН'},
+  {day:19, title:'10 целей на бумаге', desc:'Ручка, бумага. 10 целей на 3 месяца.', time:'15 МИН'},
+  {day:20, title:'ЭКВАТОР', desc:'Половина пройдена. Отдохни. Ты молодец.', time:'ВЕСЬ ДЕНЬ'},
+  {day:21, title:'Позвони родителям', desc:'Звонок. Не текст. Спроси как дела.', time:'10 МИН'},
+  {day:22, title:'3 часа без телефона', desc:'В другой комнате. Читай, гуляй.', time:'3 ЧАСА'},
+  {day:23, title:'Новое блюдо', desc:'YouTube рецепт. Приготовь, съешь.', time:'40 МИН'},
+  {day:24, title:'Благодарность', desc:'Напиши кому-то кто помог. Отправь.', time:'10 МИН'},
+  {day:25, title:'Километр бегом', desc:'Медленно — нормально. Без остановки.', time:'10 МИН'},
+  {day:26, title:'Траты за 3 дня', desc:'Каждую покупку. Всё в блокнот.', time:'5 МИН/ДЕНЬ'},
+  {day:27, title:'Документалка', desc:'Про успешного человека. Делай заметки.', time:'60 МИН'},
+  {day:28, title:'Отпишись', desc:'От токсичных людей. Без драмы.', time:'10 МИН'},
+  {day:29, title:'Подъём в 6:00', desc:'Один день. Докажи себе.', time:'ВЕСЬ ДЕНЬ'},
+  {day:30, title:'Комплимент незнакомцу', desc:'Искренний. Наблюдай реакцию.', time:'1 МИН'},
+  {day:31, title:'Стоп-лист', desc:'10 вещей которые прекращаешь делать.', time:'10 МИН'},
+  {day:32, title:'50 отжиманий', desc:'За день. Раздели на подходы.', time:'ВЕСЬ ДЕНЬ'},
+  {day:33, title:'Новость экономики', desc:'Прочитай, разберись, запиши вывод.', time:'15 МИН'},
+  {day:34, title:'План на завтра', desc:'Распиши по часам вечером.', time:'10 МИН'},
+  {day:35, title:'День чистой еды', desc:'Ноль фастфуда. Ноль сахара.', time:'ВЕСЬ ДЕНЬ'},
+  {day:36, title:'100 прыжков', desc:'На скакалке или просто. 100 раз.', time:'3 МИН'},
+  {day:37, title:'Обнови резюме', desc:'Актуализируй навыки, опыт.', time:'30 МИН'},
+  {day:38, title:'Позвони, скажи "спасибо"', desc:'Кто-то кто помог. Голосом.', time:'5 МИН'},
+  {day:39, title:'5 достижений', desc:'За месяц. Чем гордишься? Запиши.', time:'10 МИН'},
+  {day:40, title:'Письмо из будущего', desc:'Ты через год пишешь тебе. Сохрани.', time:'20 МИН'},
+];
+
+const PROMO = 'rttd67hyo1!';
+const ADMIN_PASS = 'rttd67hyo1';
+
+let STATE = {isAuth:false, isAdmin:false, currentDay:1, completed:[], streak:0, userPromo:null};
+let USERS = [];
+
+try { const s = localStorage.getItem('dx_state'); if(s) STATE = {...STATE, ...JSON.parse(s)}; } catch(e){}
+try { const u = localStorage.getItem('dx_users'); if(u) USERS = JSON.parse(u); } catch(e){}
+
+const save = () => {
+  localStorage.setItem('dx_state', JSON.stringify(STATE));
+  localStorage.setItem('dx_users', JSON.stringify(USERS));
+};
+
+function checkPromo() {
+  const code = document.getElementById('promoInput').value.trim();
+  if(code === PROMO) {
+    STATE.isAuth = true;
+    STATE.userPromo = PROMO;
+    
+    // Save Telegram data if available
+    if(isTelegram && tg.initDataUnsafe?.user) {
+      STATE.telegramId = tg.initDataUnsafe.user.id;
+      STATE.telegramName = tg.initDataUnsafe.user.first_name;
+    }
+    
+    let user = USERS.find(u=>u.promo===PROMO);
+    if(!user) {
+      USERS.push({
+        promo:PROMO,
+        currentDay:STATE.currentDay,
+        completed:[...STATE.completed],
+        lastActive:Date.now(),
+        telegramId:STATE.telegramId,
+        telegramName:STATE.telegramName
+      });
+    } else {
+      user.lastActive = Date.now();
+    }
+    save();
+    showApp();
+    if(isTelegram && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  } else {
+    document.getElementById('authError').style.display = 'block';
+    if(isTelegram && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+  }
+}
+
+function showPayment() {
+  document.getElementById('auth').classList.remove('active');
+  document.getElementById('payment').classList.add('active');
+}
+
+function backToAuth() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('auth').classList.add('active');
+}
+
+function showAdminAuth() {
+  document.getElementById('auth').classList.remove('active');
+  document.getElementById('adminAuth').classList.add('active');
+}
+
+function checkAdmin() {
+  const pass = document.getElementById('adminPass').value.trim();
+  if(pass === ADMIN_PASS) {
+    STATE.isAuth = true;
+    STATE.isAdmin = true;
+    save();
+    showAdminPanel();
+  } else {
+    document.getElementById('adminError').style.display = 'block';
+  }
+}
+
+function showApp() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('today').classList.add('active');
+  document.getElementById('nav').style.display = 'flex';
+  renderToday();
+}
+
+function showAdminPanel() {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('admin').classList.add('active');
+  document.getElementById('nav').style.display = 'none';
+  renderAdminUsers();
+}
+
+function logout() {
+  STATE = {isAuth:false, isAdmin:false, currentDay:1, completed:[], streak:0};
+  save();
+  if(isTelegram) { tg.close(); } else { location.reload(); }
+}
+
+function renderToday() {
+  const day = STATE.currentDay;
+  const task = TASKS[day-1];
+  const done = STATE.completed.includes(day);
+  
+  document.getElementById('headerDay').textContent = `ДЕНЬ ${day} / 40`;
+  document.getElementById('taskLabel').textContent = `ДЕНЬ ${day}`;
+  document.getElementById('taskTitle').textContent = task.title;
+  document.getElementById('taskDesc').textContent = task.desc;
+  document.getElementById('taskTime').textContent = task.time;
+  
+  const btn = document.getElementById('taskBtn');
+  if(done) {
+    btn.textContent = 'ВЫПОЛНЕНО';
+    btn.className = 'task-btn done';
+  } else {
+    btn.textContent = 'ВЫПОЛНИТЬ';
+    btn.className = 'task-btn';
+  }
+  
+  const total = STATE.completed.length;
+  const pct = Math.round((total/40)*100);
+  document.getElementById('progressPct').textContent = pct+'%';
+  setTimeout(()=>{ document.getElementById('progressFill').style.width = pct+'%'; }, 100);
+  
+  const grid = document.getElementById('progressGrid');
+  grid.innerHTML = '';
+  for(let i=1; i<=40; i++) {
+    const dot = document.createElement('div');
+    if(i < day) {
+      dot.className = STATE.completed.includes(i) ? 'day-dot done' : 'day-dot';
+      dot.textContent = i;
+    } else if(i === day) {
+      dot.className = 'day-dot current';
+      dot.textContent = i;
+    } else {
+      dot.className = 'day-dot locked';
+      dot.textContent = i;
+    }
+    grid.appendChild(dot);
+  }
+  
+  document.getElementById('statDone').textContent = total;
+  document.getElementById('statStreak').textContent = STATE.streak;
+}
+
+function completeTask() {
+  const day = STATE.currentDay;
+  if(STATE.completed.includes(day)) return;
+  STATE.completed.push(day);
+  STATE.streak++;
+  if(day < 40) STATE.currentDay++;
+  const user = USERS.find(u=>u.promo===STATE.userPromo);
+  if(user) {
+    user.currentDay = STATE.currentDay;
+    user.completed = [...STATE.completed];
+    user.lastActive = Date.now();
+  }
+  save();
+  renderToday();
+  
+  if(isTelegram && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+  
+  document.getElementById('modalText').textContent = day===40 
+    ? 'Все 40 дней пройдены!\nПоздравляю!' 
+    : `День ${day} выполнен.\nЗавтра день ${day+1}.`;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function renderTasksList() {
+  const list = document.getElementById('tasksList');
+  list.innerHTML = '';
+  TASKS.forEach((task)=>{
+    const d = task.day;
+    const unlocked = d <= STATE.currentDay;
+    const done = STATE.completed.includes(d);
+    const current = d === STATE.currentDay;
+    const row = document.createElement('div');
+    row.className = unlocked ? (done?'task-row done-task':'task-row') : 'task-row locked';
+    if(unlocked) {
+      row.onclick = () => {
+        STATE.currentDay = d;
+        save();
+        switchTab('today', document.querySelectorAll('.nav-btn')[0]);
+      };
+    }
+    row.innerHTML = `
+      <div class="task-num ${done?'done':current?'current':''}">${d}</div>
+      <div class="task-body">
+        <div class="task-name">${unlocked ? task.title : '—————————'}</div>
+        <div class="task-cat">${unlocked ? task.time : `ДЕНЬ ${d}`}</div>
+      </div>
+      <div class="task-icon">${done?'✓':current?'●':'○'}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='today') renderToday();
+  if(id==='tasks') renderTasksList();
+}
+
+function switchAdminTab(tab, btn) {
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  if(tab==='users') renderAdminUsers();
+  if(tab==='stats') renderAdminStats();
+}
+
+function renderAdminUsers() {
+  const content = document.getElementById('adminContent');
+  content.innerHTML = '';
+  if(USERS.length === 0) {
+    content.innerHTML = '<div style="text-align:center;opacity:0.5;padding:60px 20px">НЕТ ПОЛЬЗОВАТЕЛЕЙ</div>';
+    return;
+  }
+  USERS.forEach(u=>{
+    const card = document.createElement('div');
+    card.className = 'user-card';
+    const last = new Date(u.lastActive).toLocaleDateString('ru');
+    card.innerHTML = `
+      <div class="user-code">${u.promo}</div>
+      <div class="user-info">День ${u.currentDay}/40 · Выполнено ${u.completed.length}<br>Последний вход: ${last}</div>
+    `;
+    content.appendChild(card);
+  });
+}
+
+function renderAdminStats() {
+  const content = document.getElementById('adminContent');
+  const total = USERS.length;
+  const avg = USERS.length ? Math.round(USERS.reduce((s,u)=>s+u.completed.length,0) / USERS.length) : 0;
+  const done40 = USERS.filter(u=>u.completed.length===40).length;
+  content.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">ВСЕГО</div></div>
+      <div class="stat-card"><div class="stat-num">${avg}</div><div class="stat-label">СРЕДНИЙ</div></div>
+      <div class="stat-card"><div class="stat-num">${done40}</div><div class="stat-label">ПРОШЛИ</div></div>
+      <div class="stat-card"><div class="stat-num">40</div><div class="stat-label">ЗАДАНИЙ</div></div>
+    </div>
+  `;
+}
+
+window.onload = () => {
+  if(isTelegram) {
+    document.querySelectorAll('.header-exit').forEach(el => el.style.display = 'none');
+  }
+  if(STATE.isAdmin) showAdminPanel();
+  else if(STATE.isAuth) showApp();
+};
+</script>
+</body>
+</html>
